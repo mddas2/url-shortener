@@ -1,0 +1,78 @@
+{% extends 'layout/layout.html'%}
+{% load static %}
+
+{% block navbar %}
+{% include 'layout/navbar.html' %}
+{% endblock %}
+   
+{% block content %}
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter" style="float: right;">
+  Generate URL
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Generate URL</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="generateUrlForm" method="POST" action="{% url 'create_url' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="input-group">
+            <span class="input-group-text">URL</span>
+            <input type="text" name="long_url" class="form-control" aria-label="URL" required placeholder="original url">
+          </div>
+          <!-- <div class="input-group">
+            <span class="input-group-text">URL</span>
+            <input type="text" name="short_key" class="form-control" aria-label="URL" placeholder="Custom url">
+          </div> -->
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Generate URL</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% if messages %}
+  <div class="alert alert-info">
+    <!-- <strong>Error:</strong> Please correct the following errors: -->
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+
+<div class="container  mt-4">
+<ol class="list-group list-group-numbered">
+  {% for url in urls %}
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">{{url.long_url}}</div>
+        {{url.short_key}}
+        <a href="{% url 'redirect_view' short_key=url.short_key %}" style="color: blue;" target="_blank">open</a>
+      </div>
+
+      <span class="badge bg-primary rounded-pill">{{url.click_count}}</span>
+      
+    </li>
+  {% endfor %}
+  </ol>
+</div>
+
+
+{% endblock %}

@@ -4,9 +4,9 @@ from django.db import models
 from account.models import CustomUser
 
 class ShortenedURL(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser,related_name = "urls", on_delete=models.CASCADE)
     long_url = models.URLField()
-    short_key = models.CharField(max_length=10, unique=True)
+    short_key = models.CharField(max_length=10, unique=True,null=True)
     click_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
