@@ -22,17 +22,13 @@ def signup(request):
     form = SignupForm(request.POST or None)
     if request.method=='POST':
         if form.is_valid():
+    
             email = form.cleaned_data['email'].lower()
             phone = str(form.cleaned_data['phone_number'])
             if not handle_signup_validation(request, email, phone):
                 return redirect('account:signup')
             User = get_user_model()
-            # new_user=User.objects.create_user(token=str(generate_unique_four_digit_number()),
-                                    #  **form.cleaned_data)
-            subject="Verify your account."
-            # message=f"Your pin is {new_user.token}. Login with your new account and enter this pin to verify."
-            # send_token_mail(new_user.email,subject,message)s
-            messages.success(request,"Account created Successfully. Login Now.")
+            new_user=User.objects.create_user(**form.cleaned_data)
             return redirect(reverse('account:login_user'))  
         else:
             #messages.error(request, 'User not created! Please fill the form with correct data!')

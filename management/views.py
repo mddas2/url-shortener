@@ -11,24 +11,40 @@ from .models import ShortenedURL
 from django.utils import timezone
 import hashlib
 import string
+import random
 
 @login_required
 def Dashboard(request):
     # print(request.user, " request")
-    print(ShortenedURL.objects.filter(user_id = request.user.id))
+
     context  = {
-        'urls':ShortenedURL.objects.filter(user_id = request.user.id)
+        'urls':ShortenedURL.objects.filter(user_id = request.user.id).order_by('-created_at')
     }
     print(context)
     return render(request,'management/dashboard.html',context)
 
-def create_url(request):
+@login_required
+def create_url(request,item_id=None):
+    instance = None
+
+    # If item_id is provided, attempt to get the object from the database
+    if item_id:
+        instance = get_object_or_404(ShortenedURL, id=item_id)
+
     if request.method == 'POST':
-        form = ShortenedURLForm(request.POST)
+        form = ShortenedURLForm(request.POST,instance=instance)
         if form.is_valid():
             # Save the form data to the database
             form.instance.user = request.user
-            form.instance.short_key = GenerateUrl(form.instance.long_url)
+           
+            if request.POST.get('short_key') == '':
+                form.instance.short_key = GenerateUrl(form.instance.long_url)
+            else:
+                if ShortenedURL.objects.filter(short_key = request.POST.get('short_key')) and item_id==None:
+                    messages.error(request,"Error: custom url already exists.")
+                    return redirect('user_dashboard')
+                form.instance.short_key = request.POST.get('short_key')
+            
             form.save()
             messages.success(request,"save successfully ..")
         else:
@@ -37,6 +53,9 @@ def create_url(request):
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
     else:
+        if item_id:
+            print("item id \n ",instance)
+            return render(request,'management/url_update.html',{'instance':instance})
         form = ShortenedURLForm()
 
     return redirect('user_dashboard')
@@ -56,30 +75,17 @@ def redirect_view(request, short_key):
     shortened_url.save()
     return redirect(shortened_url.long_url)
 
+
 def GenerateUrl(original_url):
     # Use SHA-256 hash function to generate a unique identifier
-    hash_object = hashlib.sha256(original_url.encode())
-    hashed_url = hash_object.hexdigest()
+    letters_and_digits = string.ascii_letters + string.digits
+    random_string = ''.join(random.choice(letters_and_digits) for _ in range(4))
+    return random_string
 
-    # Convert the hashed URL to a numeric identifier
-    numeric_identifier = int(hashed_url, 16)
-
-    # Base62 encoding
-    characters = string.digits + string.ascii_uppercase + string.ascii_lowercase
-    base = len(characters)
-
-    if numeric_identifier == 0:
-        return characters[0]
-
-    result = ''
-    while numeric_identifier:
-        numeric_identifier, remainder = divmod(numeric_identifier, base)
-        result = characters[remainder] + result
-
-    return result
-
+@login_required
 def delete_url(request,id):
-    ShortenedURL.objects.get(id = id).delete()
+    obj = get_object_or_404(ShortenedURL,user = request.user, id=id)
+    obj.delete()
     return redirect('user_dashboard')
 
 

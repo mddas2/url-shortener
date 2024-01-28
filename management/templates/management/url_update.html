@@ -1,0 +1,33 @@
+{% extends 'layout/layout.html'%}
+{% load static %}
+
+{% block navbar %}
+{% include 'layout/navbar.html' %}
+{% endblock %}
+   
+{% block content %}
+
+<br>
+<br>
+<form method="POST" action="{% url 'create_or_update_url_with_id' item_id=instance.id %}"  class="mx-auto container">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+      <label for="long_url" class="form-label">URL</label>
+      <input type="text" name="long_url" class="form-control" id="long_url" value="{{instance.long_url}}" required placeholder="Original URL">
+    </div>
+    
+    <div class="mb-3">
+      <label for="short_key" class="form-label">Custom URL</label>
+      <input type="text" name="short_key" value="{{instance.short_key}}" class="form-control" id="short_key">
+    </div>
+    
+    <div class="mb-3">
+      <label for="expired_date" class="form-label">Date</label>
+      <input type="date" name="expired_date"  value="{{ instance.expired_date|date:'Y-m-d' }}" class="form-control" id="expired_date">
+    </div>
+  
+    <button type="submit" class="btn btn-primary">Generate URL</button>
+  </form>
+  
+{% endblock %}

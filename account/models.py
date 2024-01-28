@@ -16,9 +16,6 @@ class CustomUser(AbstractUser):
     )
     phone_number = models.CharField(
         max_length=15, null=False, 
-        validators=[
-            RegexValidator(r'^\d{1,15}$', 'Phone number must be 15 digits Maximum')
-        ]
     )
     username = None
     created_date=models.DateTimeField(auto_now_add=True)

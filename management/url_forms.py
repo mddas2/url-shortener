@@ -11,3 +11,4 @@ class ShortenedURLForm(forms.ModelForm):
         if ShortenedURL.objects.filter(slug=slug).exists():
             raise forms.ValidationError('This slug is already in use. Please choose another one.')
         return slug
+
