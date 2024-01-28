@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required,user_passes_test
 from .url_forms import ShortenedURLForm
 from django.contrib import messages
 from .models import ShortenedURL
-
+from django.utils import timezone
 import hashlib
 import string
 
@@ -43,9 +43,15 @@ def create_url(request):
     # return render(request,'management/dashboard.html',)
     # return render(request, 'your_template.html', {'form': form})
 
-
 def redirect_view(request, short_key):
     shortened_url = get_object_or_404(ShortenedURL, short_key=short_key)
+
+    # Check if the URL has expired
+    if shortened_url.expired_date and shortened_url.expired_date < timezone.now().date():
+        messages.error(request," Expired Url ")
+        return redirect('user_dashboard') # Customize as needed for an expired URL page
+
+    # Update click count and redirect
     shortened_url.click_count += 1
     shortened_url.save()
     return redirect(shortened_url.long_url)
@@ -71,4 +77,9 @@ def GenerateUrl(original_url):
         result = characters[remainder] + result
 
     return result
+
+def delete_url(request,id):
+    ShortenedURL.objects.get(id = id).delete()
+    return redirect('user_dashboard')
+
 

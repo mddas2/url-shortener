@@ -4,7 +4,7 @@ from .models import ShortenedURL
 class ShortenedURLForm(forms.ModelForm):
     class Meta:
         model = ShortenedURL
-        fields = ['long_url',]  # Add 'slug' or any other fields you want to include
+        fields = ['long_url','expired_date']  # Add 'slug' or any other fields you want to include
 
     def clean_slug(self):
         slug = self.cleaned_data.get('slug')

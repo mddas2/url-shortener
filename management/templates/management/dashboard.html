@@ -29,10 +29,10 @@
             <span class="input-group-text">URL</span>
             <input type="text" name="long_url" class="form-control" aria-label="URL" required placeholder="original url">
           </div>
-          <!-- <div class="input-group">
+          <div class="input-group">
             <span class="input-group-text">URL</span>
-            <input type="text" name="short_key" class="form-control" aria-label="URL" placeholder="Custom url">
-          </div> -->
+            <input type="date" name="expired_date" class="form-control">
+          </div>
           
         </div>
         <div class="modal-footer">
@@ -65,6 +65,7 @@
         <div class="fw-bold">{{url.long_url}}</div>
         {{url.short_key}}
         <a href="{% url 'redirect_view' short_key=url.short_key %}" style="color: blue;" target="_blank">open</a>
+        <a href="{{url.qr_code.url}}" style="color: blue;" target="_blank">qr_code</a>
       </div>
 
       <span class="badge bg-primary rounded-pill">{{url.click_count}}</span>
